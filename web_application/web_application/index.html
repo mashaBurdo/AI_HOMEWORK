@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Expense Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #eee; }
+        input[type="text"], input[type="number"] { width: 100%; box-sizing: border-box; }
+        button { padding: 8px 16px; margin: 5px 0; }
+        .results { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+    </style>
+</head>
+<body>
+    <h1>Monthly Expense Calculator</h1>
+    <table id="expense-table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Amount ($)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="text" value="Groceries"></td>
+                <td><input type="number" value="15000"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input type="text" value="Rent"></td>
+                <td><input type="number" value="40000"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input type="text" value="Transportation"></td>
+                <td><input type="number" value="5000"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input type="text" value="Entertainment"></td>
+                <td><input type="number" value="10000"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input type="text" value="Communication"></td>
+                <td><input type="number" value="2000"></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><input type="text" value="Gym"></td>
+                <td><input type="number" value="3000"></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+    <button onclick="addExpenseRow()">Add Expense</button>
+    <button onclick="calculateExpenses()">Calculate</button>
+    <div class="results" id="results" style="display:none; margin-top:20px;"></div>
+    <script>
+        function addExpenseRow() {
+            const table = document.getElementById('expense-table').getElementsByTagName('tbody')[0];
+            const row = table.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            cell1.innerHTML = '<input type="text">';
+            cell2.innerHTML = '<input type="number">';
+            cell3.innerHTML = '<button onclick="removeRow(this)">Remove</button>';
+        }
+        function removeRow(btn) {
+            const row = btn.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+        function calculateExpenses() {
+            const table = document.getElementById('expense-table').getElementsByTagName('tbody')[0];
+            const rows = table.getElementsByTagName('tr');
+            let expenses = [];
+            for (let i = 0; i < rows.length; i++) {
+                const category = rows[i].cells[0].querySelector('input').value.trim();
+                const amount = parseFloat(rows[i].cells[1].querySelector('input').value);
+                if (category && !isNaN(amount)) {
+                    expenses.push({ category, amount });
+                }
+            }
+            if (expenses.length === 0) {
+                document.getElementById('results').style.display = 'none';
+                return;
+            }
+            const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+            const avgDaily = total / 30;
+            const top3 = expenses.slice().sort((a, b) => b.amount - a.amount).slice(0, 3);
+            let html = `<h2>Results</h2>`;
+            html += `<p><strong>Total expenses:</strong> $${total.toLocaleString()}</p>`;
+            html += `<p><strong>Average daily expense:</strong> $${avgDaily.toLocaleString(undefined, {maximumFractionDigits:2})}</p>`;
+            html += `<p><strong>Top 3 expenses:</strong></p><ol>`;
+            top3.forEach(e => {
+                html += `<li>${e.category} ($${e.amount.toLocaleString()})</li>`;
+            });
+            html += `</ol>`;
+            document.getElementById('results').innerHTML = html;
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
